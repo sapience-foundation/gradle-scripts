@@ -6,6 +6,8 @@ def setExtProperty( propVarName, propVarValue ) {
 }
 
 ext {
+    
+    UNDEFINED = 'undefined'
 
     setExtProperty("defaultDomain", "MY_DOMAIN") ;
     setExtProperty("defaultEmail", "contact@{defaultDomain}") ;

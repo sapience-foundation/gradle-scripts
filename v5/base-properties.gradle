@@ -1,0 +1,49 @@
+
+def setExtProperty( propVarName, propVarValue ) {
+    if ( !project.ext.properties.containsKey(propVarName) ) {
+    	project.ext.set(propVarName, project.hasProperty(propVarName) ? project.findProperty(propVarName) : propVarValue ) ;
+    }
+}
+
+ext {
+
+    setExtProperty("defaultDomain", "MY_DOMAIN") ;
+    setExtProperty("defaultEmail", "contact@{defaultDomain}") ;
+
+    setExtProperty("defaultNexusDomain", "nexus.${defaultDomain}") ;
+    setExtProperty("defaultNexusUrl", "https://${defaultNexusDomain}") ;
+    setExtProperty("defaultArtifactGroup", "com.MY_GROUP") ;
+
+    setExtProperty("defaultNexusUsername", "MY_NEXUSUSER") ;
+    setExtProperty("defaultNexusPassword", "MY_NEXUSPASS") ;
+
+    setExtProperty("defaultNpmAuthToken", "MY_NPMTOKEN") ;
+    setExtProperty("defaultNpmCacheDir", "MY_NPMCACHEDIR") ;
+
+    setExtProperty("defaultNpmSnapshotPrefix", "@my-snapshots/") ;
+    setExtProperty("defaultNpmReleasePrefix", "@my-releases/") ;    
+
+    ////////////////////////
+
+    theEmail = project.hasProperty('theEmail') ? "${theEmail}" : "${defaultEmail}"
+
+    theNexusUrl = project.hasProperty('nexusUrl') ? "${nexusUrl}" : "${defaultNexusUrl}"
+    theNexusRepository = project.hasProperty('nexusRepository') ? "${nexusRepository}" : UNDEFINED
+    theNexusGroup = project.hasProperty('nexusGroup') ? "${nexusGroup}" : 'maven-public'
+    theNexusUsername = project.hasProperty('nexusUsername') ? "${nexusUsername}" : "${defaultNexusUsername}"
+    theNexusPassword = project.hasProperty('nexusPassword') ? "${nexusPassword}" : "${defaultNexusPassword}"
+
+    theReleaseNumber = project.hasProperty('releaseNumber') ? "${releaseNumber}" : UNDEFINED
+    theVersionSuffix = project.hasProperty('versionSuffix') ? "${versionSuffix}" : UNDEFINED
+    theArtifactSuffix = project.hasProperty('artifactSuffix') ? "${artifactSuffix}" : UNDEFINED
+    theEnvironment = project.hasProperty('environment') ? "${environment}" : UNDEFINED
+
+    theArtifactGroup = project.hasProperty('artifactGroup') ? "${artifactGroup}" : "${defaultArtifactGroup}"
+
+    theNpmAuthToken = project.hasProperty('npmAuthToken') ? "${npmAuthToken}" : "${defaultNpmAuthToken}"
+    theNpmCacheDir = project.hasProperty('npmCacheDir') ? "${npmCacheDir}" : "${defaultNpmCacheDir}"
+
+    theNpmSnapshotPrefix = project.hasProperty('npmSnapshotPrefix') ? "${npmSnapshotPrefix}" : "${defaultNpmSnapshotPrefix}"
+    theNpmReleasePrefix = project.hasProperty('npmReleasePrefix') ? "${npmReleasePrefix}" : "${defaultNpmReleasePrefix}"
+
+}

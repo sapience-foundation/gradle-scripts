@@ -1,0 +1,83 @@
+apply from: 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master/v5/base-properties.gradle'
+
+apply plugin: 'cpp'
+apply plugin: 'distribution'
+apply plugin: 'maven'
+
+// ======================================================================================
+// Configure Compilers ==================================================================
+
+model {
+    toolChains {
+        gcc(Gcc) {
+            if (project.hasProperty("arch") && project.ext.arch == "ARMv7") {
+                println "compiling for ${project.ext.arch}"
+                eachPlatform {
+                    cppCompiler.executable 'arm-linux-gnueabihf-g++'
+                    linker.executable 'arm-linux-gnueabihf-g++'
+
+                    cppCompiler.withArguments { args ->
+                        args.remove("-m64")
+                    }
+
+                    linker.withArguments { args ->
+                        args.remove("-m64")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+// ======================================================================================
+// Binary Distribution ==================================================================
+
+distributions {
+    main {
+        contents {
+            from { 'build/exe' }
+        }
+    }
+}
+
+// ======================================================================================
+// Maven Deploy =========================================================================
+
+project.ext {
+    DEV_ENVIRONMENT = 'DEV'
+    PROD_ENVIRONMENT = 'PROD'
+    UNDEFINED = 'undefined'
+}
+
+ext {
+
+    if (theEnvironment == PROD_ENVIRONMENT) {
+        theVersionSuffix = ''
+        theArtifactSuffix = ''
+        theNexusRepository = 'releases'
+    } else if (theEnvironment == DEV_ENVIRONMENT) {
+        theVersionSuffix = '-SNAPSHOT'
+        theArtifactSuffix = '-SNAPSHOT'
+        theNexusRepository = 'snapshots'
+    } else if (theEnvironment == UNDEFINED) {
+        theVersionSuffix = '-LOCAL'
+        theArtifactSuffix = '-SNAPSHOT'
+        theNexusRepository = UNDEFINED
+    } else {
+        throw new RuntimeException("Invalid build environment [${theEnvironment}]!")
+    }
+}
+
+version = "${theReleaseNumber}${theVersionSuffix}"
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: "${theNexusUrl}/repository/${theNexusRepository}/") {
+            authentication(userName: "${theNexusUsername}", password: "${theNexusPassword}")
+        }
+    }
+}
+
+
+

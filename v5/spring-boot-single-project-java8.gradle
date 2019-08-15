@@ -1,0 +1,13 @@
+apply from: 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master/v5/single-project-java8.gradle'
+
+dependencies {
+    implementation platform(group: 'org.springframework.boot', name: 'spring-boot-dependencies', version: springBootVersion)
+
+    if (project.hasProperty('springCloudTrain')) {
+        implementation platform(group: 'org.springframework.cloud', name: 'spring-cloud-dependencies', version: springCloudTrain)
+    }
+
+    if (project.hasProperty('springSecurityVersion')) {
+        implementation platform(group: 'org.springframework.security', name: 'spring-security-bom', version: springSecurityVersion)
+    }
+}

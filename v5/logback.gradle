@@ -1,0 +1,10 @@
+ext {
+    logbackVersion = "1.2.3"
+    janinoVersion = "3.0.7"
+}
+
+dependencies {
+    compile group: "ch.qos.logback", name: "logback-classic", version: logbackVersion
+    compile group: "ch.qos.logback", name: "logback-access", version: logbackVersion
+    compile group: "org.codehaus.janino", name: "janino", version: janinoVersion
+}

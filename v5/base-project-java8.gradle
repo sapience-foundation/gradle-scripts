@@ -1,0 +1,250 @@
+apply from: 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master/v5/base-properties.gradle'
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath "io.franzbecker:gradle-lombok:3.1.0"
+    }
+    
+    if (!gradle.gradleVersion.startsWith("5.")) {
+        throw new GradleException('Sapience Foundation /v5/ Gradle scripts requires Gradle 5.+. See file gradle/wrapper/gradle-wrapper.properties in your project.')
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven'
+apply plugin: 'jacoco'
+apply plugin: 'eclipse-wtp'
+apply plugin: 'project-report'
+apply plugin: io.franzbecker.gradle.lombok.LombokPlugin
+
+sourceCompatibility = 1.8
+[compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
+
+project.ext {
+    DEV_ENVIRONMENT = 'DEV'
+    PROD_ENVIRONMENT = 'PROD'
+    UNDEFINED = 'undefined'
+}
+
+ext {
+
+    if (theEnvironment == PROD_ENVIRONMENT) {
+        theVersionSuffix = ''
+        theArtifactSuffix = ''
+        theNexusRepository = 'maven-releases'
+    } else if (theEnvironment == DEV_ENVIRONMENT) {
+        theVersionSuffix = '-SNAPSHOT'
+        theArtifactSuffix = '-SNAPSHOT'
+        theNexusRepository = 'maven-snapshots'
+    } else if (theEnvironment == UNDEFINED) {
+        theVersionSuffix = '-LOCAL'
+        theArtifactSuffix = '-SNAPSHOT'
+        theNexusRepository = UNDEFINED
+    } else {
+        throw new RuntimeException("Invalid build environment [${theEnvironment}]!")
+    }
+
+    theLombokVersion = project.hasProperty('lombokVersion') ? "${lombokVersion}" : '1.18.8'
+    theJunitVersion = project.hasProperty('junitVersion') ? "${junitVersion}" : '4.12'
+    theHamcrestVersion = project.hasProperty('hamcrestVersion') ? "${hamcrestVersion}" : '2.1'
+    theMockitoVersion = project.hasProperty('mockitoVersion') ? "${mockitoVersion}" : '2.28.2'
+}
+
+version = "${theReleaseNumber}${theVersionSuffix}"
+
+dependencies {
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: theLombokVersion
+    testCompile group: 'junit', name: 'junit', version: theJunitVersion
+    testCompile group: 'org.hamcrest', name: 'hamcrest', version: theHamcrestVersion
+    testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: theHamcrestVersion
+    testCompile group: 'org.mockito', name: 'mockito-core', version: theMockitoVersion
+}
+
+sourceSets {
+    integrationTest {
+        java {
+            compileClasspath += sourceSets.main.output + sourceSets.test.output
+            runtimeClasspath += sourceSets.main.output + sourceSets.test.output
+            srcDirs = ['src/it/java']
+        }
+        resources.srcDirs = ['src/it/resources']
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+configurations.all {
+    resolutionStrategy {
+        eachDependency { DependencyResolveDetails details ->
+            def requested = details.requested
+            if (requested.group == "${theArtifactGroup}") {
+                def requestedVersion = requested.version
+                if (!requestedVersion.contains('-') && theArtifactSuffix != '') {
+                    details.useVersion "${requestedVersion}${theArtifactSuffix}"
+                }
+            }
+        }
+
+        cacheDynamicVersionsFor 600, 'seconds'
+        cacheChangingModulesFor 600, 'seconds'
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task showVersion {
+    doLast {
+        println "${project.version}"
+    }
+}
+
+task integrationTest(type: Test) {
+    group 'Verification'
+    description 'Runs the integration tests.'
+    testClassesDirs += sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+tasks.withType(Test) {
+    // This exists to separate unit test reporting from integration tests
+    reports.html.destination = file("${reporting.baseDir}/${name}")
+
+    // to avoid annoying awt popups during test execution
+    systemProperty 'java.awt.headless', 'true'
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url "${theNexusUrl}/repository/${theNexusGroup}"
+        credentials {
+            username "${theNexusUsername}"
+            password "${theNexusPassword}"
+        }
+    }
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: "${theNexusUrl}/repository/${theNexusRepository}/") {
+            authentication(userName: "${theNexusUsername}", password: "${theNexusPassword}")
+        }
+    }
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.version = "${version}"
+    }
+}
+
+eclipse {
+    classpath {
+        downloadSources = true
+        downloadJavadoc = true
+        plusConfigurations.add configurations.integrationTestCompile
+        plusConfigurations.add configurations.integrationTestRuntime
+    }
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+        testSourceDirs += sourceSets.integrationTest.java.srcDirs
+        testResourceDirs += sourceSets.integrationTest.resources.srcDirs
+        scopes.TEST.plus += [configurations.integrationTestCompile, configurations.integrationTestRuntime]
+    }
+}
+
+jacoco {
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+
+task jacocoIntegrationTestReport(type: JacocoReport) {
+    sourceSets sourceSets.integrationTest
+    executionData integrationTest
+}
+
+ext.runOSCommand = { command, directory ->
+    def output = null
+    try {
+        def process = Runtime.getRuntime().exec(command, null, directory)
+        process.waitForOrKill(5000)
+        def exitValue = process.exitValue()
+        def errorMessage = process.err.text;
+        if (exitValue || errorMessage?.trim()) {
+            errorMessage = errorMessage.replace("\n", " ")
+            if (errorMessage.length() > 100) {
+                errorMessage = errorMessage.substring(0, 95) + " ..."
+            }
+            println "OS command [${command}] exited with code ${exitValue}. Error output: ${errorMessage}."
+        } else {
+            output = process.text.trim()
+        }
+    } catch (Exception ex) {
+        println "Error running OS command [${command}]. Error message: ${ex.message}."
+    }
+    return (output ? output : UNDEFINED)
+}
+
+ext.getCommitHash = { project ->
+    return runOSCommand("git rev-parse --short HEAD", project.projectDir)
+}
+
+ext.getFormatedCommitTimestamp = { project, format ->
+    def commitDateString = runOSCommand("git log -1 --format=%cd HEAD", project.projectDir)
+    if (commitDateString != UNDEFINED) {
+        def commitDate = new java.text.SimpleDateFormat("EE MMM dd HH:mm:ss yyyy Z", Locale.US).parse(commitDateString)
+        return commitDate.format(format, TimeZone.getTimeZone('GMT'))
+    }
+    return UNDEFINED
+}
+
+ext.getCommitTimestamp = { project ->
+    return getFormatedCommitTimestamp(project, "yyyyMMddHHmm")
+}
+
+ext.getShortCommitTimestamp = { project ->
+    return getFormatedCommitTimestamp(project, "yyyyMMdd")
+}
+
+task validateReleaseNumber() {
+    doLast {
+        if (theEnvironment == DEV_ENVIRONMENT) {
+            def tags = runOSCommand('git tag', project.projectDir)
+            def tagsList = tags.split("\n")
+            def currentRelease = theReleaseNumber.replaceAll("'", "").replaceAll('"', '')
+            tagsList.each {
+                if (it == currentRelease.toString()) {
+                    throw new GradleException("A tag with release number ${theReleaseNumber} already exists, please increment the releaseNumber of this project on gradle.properties")
+                }
+            }
+        }
+    }
+}
+
+compileJava.dependsOn validateReleaseNumber
+

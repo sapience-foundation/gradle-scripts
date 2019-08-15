@@ -1,0 +1,169 @@
+apply from: 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master/v5/base-properties.gradle'
+
+import groovy.json.JsonBuilder
+import groovy.json.JsonSlurper
+
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath 'com.moowork.gradle:gradle-node-plugin:1.3.1'
+    }
+}
+
+apply plugin: com.moowork.gradle.node.NodePlugin
+
+ext {
+    localNpmCacheDir = '/tmp/npm-cache'
+    cmd = project.hasProperty('cmd') ? project.property('cmd') : ''
+}
+
+node {
+    version = nodeVersion
+    npmVersion = npmVersion
+    download = true
+}
+
+task clean(type: Delete) {
+    delete 'node_modules', 'build'
+}
+
+task npmConfigCache(type: NpmTask) {
+    def cacheDir = project.hasProperty('environment') ? theNpmCacheDir : localNpmCacheDir
+    args = ['config', 'set', 'cache', cacheDir]
+}
+
+task npmConfigAuth(type: NpmTask) {
+    args = ['config', 'set', '_auth', "${theNpmAuthToken}"]
+}
+
+task npmConfigEmail(type: NpmTask) {
+    args = ['config', 'set', 'email', "${theEmail}"]
+}
+
+task npmConfigPrivateRegistry(type: NpmTask) {
+    args = ['config', 'set', 'registry', '${theNexusUrl}/repository/npm-internal/']
+}
+
+task npmConfigAllRegistries(type: NpmTask) {
+    args = ['config', 'set', 'registry', '${theNexusUrl}/repository/npm-all/']
+}
+
+task npmConfigAlwaysAuth(type: NpmTask) {
+    args = ['config', 'set', 'always-auth', true]
+}
+
+task npmPublish(type: NpmTask, dependsOn: ['npmConfigAuth', 'npmConfigPrivateRegistry',
+                                           'npmConfigEmail', 'npmConfigAlwaysAuth', 'modifyPackageName']) {
+    args = ['publish']
+}
+
+task npmRunTest(type: NpmTask) {
+    args = ['run', 'test']
+}
+
+task npmRunBuild(type: NpmTask) {
+    if (project.hasProperty('environment') && project.property('environment') == 'PROD') {
+        args = ['run', 'build', '--production']
+    } else if (project.hasProperty('environment') && project.property('environment') == 'STAGING') {
+        args = ['run', 'build:staging']
+    } else {
+        args = ['run', 'build']
+    }
+
+}
+
+task npmRun(type: NpmTask) {
+    args = ['run', cmd]
+}
+
+task modifyPackageName() {
+    doLast {
+
+        if (!project.hasProperty('environment')) {
+            throw new RuntimeException("Missing environment parameter!")
+        }
+
+        def env = project.property('environment')
+        if (env != 'DEV' && env != 'PROD') {
+            throw new RuntimeException("Invalid build environment [${env}]!")
+        }
+
+        def packageFile = new File('package.json')
+        def json = new JsonSlurper().parseText(packageFile.text)
+        def packageName = json.name
+
+        if (packageName.contains('@') || packageName.contains('/')) {
+            throw new RuntimeException("Invalid package name [${packageName}]!")
+        }
+
+        def prefix = env == 'PROD' ? theNpmReleasePrefix : theNpmSnapshotPrefix
+        json.name = prefix + packageName
+        def builder = new JsonBuilder(json)
+
+        packageFile.write builder.toPrettyString()
+
+        println "Successfully renamed project [${json.name}]"
+
+    }
+}
+
+ext.runOSCommand = { command, directory ->
+    def output = null
+    try {
+        def process = Runtime.getRuntime().exec(command, null, directory)
+        process.waitForOrKill(5000)
+        def exitValue = process.exitValue()
+        def errorMessage = process.err.text
+        if (exitValue || errorMessage?.trim()) {
+
+            errorMessage = errorMessage.replace("\n", " ")
+            if (errorMessage.length() > 100) {
+                errorMessage = errorMessage.substring(0, 95) + " ..."
+            }
+
+            println "OS command [${command}] exited with code ${exitValue}. Error output: ${errorMessage}."
+
+        } else {
+            output = process.text.trim()
+        }
+    } catch (Exception ex) {
+        println "Error running OS command [${command}]. Error message: ${ex.message}."
+    }
+    return (output ? output : UNDEFINED)
+}
+
+
+task validateReleaseNumber() {
+    doLast {
+        def env = project.hasProperty('environment') ? project.property('environment') : ''
+        if (env == 'DEV') {
+            def packageFile = new File('package.json')
+            def json = new JsonSlurper().parseText(packageFile.text)
+            def version = json.version
+            def tags = runOSCommand('git tag', project.projectDir)
+            def tagsList = tags.split("\n")
+            def currentRelease = version.replaceAll("'", "").replaceAll('"', '')
+            tagsList.each {
+                if (it == currentRelease.toString()) {
+                    throw new GradleException("A tag with release number ${version} already exists, please increment the releaseNumber of this project on gradle.properties")
+                }
+            }
+            println "Version ${version} is valid"
+        }
+    }
+}
+
+npmInstall.dependsOn npmConfigCache
+npmInstall.dependsOn npmConfigAllRegistries
+npmInstall.dependsOn npmConfigAuth
+npmInstall.dependsOn npmConfigEmail
+npmInstall.dependsOn validateReleaseNumber
+
+
+
+
+

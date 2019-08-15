@@ -10,7 +10,7 @@ ext {
     UNDEFINED = 'undefined' ;
 
     setExtProperty("defaultDomain", "MY_DOMAIN") ;
-    setExtProperty("defaultEmail", "contact@{defaultDomain}") ;
+    setExtProperty("defaultEmail", "contact@${defaultDomain}") ;
 
     setExtProperty("defaultNexusDomain", "nexus.${defaultDomain}") ;
     setExtProperty("defaultNexusUrl", "https://${defaultNexusDomain}") ;

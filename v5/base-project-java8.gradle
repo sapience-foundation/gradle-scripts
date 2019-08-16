@@ -138,14 +138,13 @@ artifacts {
 repositories {
     mavenLocal()
     maven {
-        def nexusHost = getUrlHost(theNexusUrl)
-        getHostIP(nexusHost , "Checking Nexus URL Host")
+        if ( getHostIP( getUrlHost(theNexusUrl) , "Checking Nexus URL Host") ) {
+            url "${theNexusUrl}/repository/${theNexusGroup}"
 
-        url "${theNexusUrl}/repository/${theNexusGroup}"
-
-        credentials {
-            username "${theNexusUsername}"
-            password "${theNexusPassword}"
+            credentials {
+                username "${theNexusUsername}"
+                password "${theNexusPassword}"
+            }    
         }
     }
 }

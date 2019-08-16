@@ -7,16 +7,19 @@ ext.setExtProperty = { propVarName, propVarValue ->
 }
 
 ext.getUrlHost = { url ->
+    if ( !url ) return null ;
     return "${url}".toURL().host
 }
 
 ext.getHostIP = { host , purpose ->
+    if ( !host ) return null ;
+    
     try {
         return InetAddress.getByName(host).address.collect { it & 0xFF }.join('.')
     }
     catch (Exception e) {
         System.err.println "*** CAN'T RESOLVE HOST: $host > ${purpose}"
-        throw e
+        return null
     }
 }
 

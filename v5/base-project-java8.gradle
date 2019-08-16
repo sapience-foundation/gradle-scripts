@@ -138,8 +138,8 @@ artifacts {
 repositories {
     mavenLocal()
     maven {
-        def nexusHost = ext.getUrlHost(theNexusUrl)
-        ext.getHostIP(nexusHost , "Checking Nexus URL Host")
+        def nexusHost = getUrlHost(theNexusUrl)
+        getHostIP(nexusHost , "Checking Nexus URL Host")
 
         url "${theNexusUrl}/repository/${theNexusGroup}"
 

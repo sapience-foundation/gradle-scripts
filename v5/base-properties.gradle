@@ -13,12 +13,12 @@ ext.getUrlHost = { url ->
 
 ext.getHostIP = { host , purpose ->
     if ( !host ) return null ;
-    
+
     try {
         return InetAddress.getByName(host).address.collect { it & 0xFF }.join('.')
     }
     catch (Exception e) {
-        System.err.println "*** CAN'T RESOLVE HOST: $host > ${purpose}"
+        System.err.println "*** ${purpose} > CAN'T RESOLVE HOST: $host"
         return null
     }
 }

@@ -67,7 +67,8 @@ ext {
     theNpmReleasePrefix = project.hasProperty('npmReleasePrefix') ? "${npmReleasePrefix}" : "${defaultNpmReleasePrefix}"
 
     ////////////////////////
-
+    
+    println ""
     println "************************"
     println "** PROJECT PROPERTIES **"
     println "************************"
@@ -96,5 +97,6 @@ ext {
     }
     
     println "************************"
+    println ""
     
 }

@@ -1,25 +1,25 @@
 
-def setExtProperty( propVarName, propVarValue ) {
-    if ( !project.ext.properties.containsKey(propVarName) ) {
-    	project.ext.set(propVarName, project.hasProperty(propVarName) ? project.findProperty(propVarName) : propVarValue ) ;
-    }
-}
-
-def getUrlHost( url ) {
-    return "${url}".toURL().host
-}
-
-def getHostIP( host , purpose ) {
-    try {
-        return InetAddress.getByName(host).address.collect { it & 0xFF }.join('.')
-    }
-    catch (Exception e) {
-        System.err.println "*** CAN'T RESOLVE HOST: $host > ${purpose}"
-        throw e
-    }
-}
-
 ext {
+
+    def setExtProperty( propVarName, propVarValue ) {
+        if ( !project.ext.properties.containsKey(propVarName) ) {
+            project.ext.set(propVarName, project.hasProperty(propVarName) ? project.findProperty(propVarName) : propVarValue ) ;
+        }
+    }
+
+    def getUrlHost( url ) {
+        return "${url}".toURL().host
+    }
+
+    def getHostIP( host , purpose ) {
+        try {
+            return InetAddress.getByName(host).address.collect { it & 0xFF }.join('.')
+        }
+        catch (Exception e) {
+            System.err.println "*** CAN'T RESOLVE HOST: $host > ${purpose}"
+            throw e
+        }
+    }
 
     UNDEFINED = 'undefined' ;
 

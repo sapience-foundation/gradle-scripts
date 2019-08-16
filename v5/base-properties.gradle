@@ -68,7 +68,9 @@ ext {
 
     ////////////////////////
 
+    println "************************"
     println "** PROJECT PROPERTIES **"
+    println "************************"
     println ""
     println "-- environment: ${theEnvironment}"
     println "-- domain: ${theDomain}"

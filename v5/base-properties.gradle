@@ -68,14 +68,23 @@ ext {
 
     ////////////////////////
 
-    println "** PROPERTIES:"
+    println "** PROJECT PROPERTIES **"
+    println ""
     println "-- environment: ${theEnvironment}"
-    println "-- theDomain: ${theDomain}"
-    println "-- theEmail: ${theEmail}"
+    println "-- domain: ${theDomain}"
+    println "-- email: ${theEmail}"
+    println "-- artifactGroup: ${theArtifactGroup}"
+    println ""
+    println "Nexus:"
     println "-- nexusUrl: ${theNexusUrl}"
     println "-- nexusRepository: ${theNexusRepository}"
     println "-- nexusGroup: ${theNexusGroup}"
     println "-- nexusUsername: ${theNexusUsername}"
-    println "-- artifactGroup: ${theArtifactGroup}"
-
+    println ""
+    println "NPM:"
+    println "-- npmCacheDir: ${theNpmCacheDir}"
+    println "-- npmReleasePrefix: ${theNpmReleasePrefix}"
+    println "-- npmSnapshotPrefix: ${theNpmSnapshotPrefix}"
+    println ""
+    
 }

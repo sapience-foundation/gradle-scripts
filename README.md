@@ -1,10 +1,51 @@
 Sapience Foundation - Gradle Scripts
 ==============
 
-With `Gradle`, you can configure the current project to using an external build script. All of the Gradle build language is available in the external script. You can even apply other scripts from the external script.
+A simple way to use Gradle with your projects.
 
-With this repo, the idea is applies the given script to the current project. In other words, simple names occurring in the script (*e.g. path*) will be resolved using the project object.
+Java - Single Project
+----
 
-To give an example, applying a script containing `println path` will print `project.path`.
+- /build.gradle
+  ```
+  apply from: 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master/v5/single-project-java8.gradle'
+  
+  dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+  }
+  
+  ```
+  
+Java - Multi Project
+----
 
-`apply from:, to:` applies the given script to the object specified by `to:.` To give an example, applying a script containing `println path` to task will print `task.path`.
+- /build.gradle
+  ```
+  apply from: 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master/v5/multi-project-java8.gradle'
+  
+  ```
+  
+- /sub-project-a/build.gradle
+  ```
+  dependencies {
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+  }
+  
+  ```
+  
+- /sub-project-b/build.gradle
+  ```
+  dependencies {
+    compile project(':sub-project-a')
+    
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+  }
+  ```
+
+

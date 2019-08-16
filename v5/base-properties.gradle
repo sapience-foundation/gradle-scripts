@@ -77,17 +77,24 @@ ext {
     println "-- email: ${theEmail}"
     println "-- artifactGroup: ${theArtifactGroup}"
     println ""
-    println "Nexus:"
-    println "-- nexusUrl: ${theNexusUrl}"
-    println "-- nexusRepository: ${theNexusRepository}"
-    println "-- nexusGroup: ${theNexusGroup}"
-    println "-- nexusUsername: ${theNexusUsername}"
-    println ""
-    println "NPM:"
-    println "-- npmCacheDir: ${theNpmCacheDir}"
-    println "-- npmReleasePrefix: ${theNpmReleasePrefix}"
-    println "-- npmSnapshotPrefix: ${theNpmSnapshotPrefix}"
-    println ""
+    
+    if ( !theNexusUrl.contains("UNDEFINED_DOMAIN") ) {
+      println "Nexus:"
+      println "-- nexusUrl: ${theNexusUrl}"
+      println "-- nexusRepository: ${theNexusRepository}"
+      println "-- nexusGroup: ${theNexusGroup}"
+      println "-- nexusUsername: ${theNexusUsername}"
+      println ""
+    }
+    
+    if ( !theNpmCacheDir.contains("UNDEFINED_NPMCACHEDIR") ) {
+      println "NPM:"
+      println "-- npmCacheDir: ${theNpmCacheDir}"
+      println "-- npmReleasePrefix: ${theNpmReleasePrefix}"
+      println "-- npmSnapshotPrefix: ${theNpmSnapshotPrefix}"
+      println ""
+    }
+    
     println "************************"
     
 }

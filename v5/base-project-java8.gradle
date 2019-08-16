@@ -137,15 +137,22 @@ artifacts {
 
 repositories {
     mavenLocal()
-    maven {
-        if ( getHostIP( getUrlHost(theNexusUrl) , "Checking Nexus URL Host") ) {
+
+    if ( getHostIP( getUrlHost(theNexusUrl) , "Checking Nexus URL Host") ) {
+        println "*** Defining Maven: ${theNexusUrl}"
+
+        maven {
             url "${theNexusUrl}/repository/${theNexusGroup}"
 
             credentials {
                 username "${theNexusUsername}"
                 password "${theNexusPassword}"
-            }    
+            }
         }
+    }
+    else {
+        println "*** Defining Maven CENTRAL"
+        mavenCentral()
     }
 }
 

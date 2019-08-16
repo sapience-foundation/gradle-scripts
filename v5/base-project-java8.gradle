@@ -139,7 +139,7 @@ repositories {
     mavenLocal()
 
     if ( getHostIP( getUrlHost(theNexusUrl) , "Checking Nexus URL Host") ) {
-        println "*** Defining Maven: ${theNexusUrl}"
+        println "*** Using Maven: ${theNexusUrl}"
 
         maven {
             url "${theNexusUrl}/repository/${theNexusGroup}"
@@ -151,7 +151,7 @@ repositories {
         }
     }
     else {
-        println "*** Defining Maven CENTRAL"
+        println "*** Using Maven CENTRAL"
         mavenCentral()
     }
 }

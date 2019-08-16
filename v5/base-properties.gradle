@@ -27,18 +27,17 @@ ext {
 
     UNDEFINED = 'undefined' ;
 
-    setExtProperty("defaultDomain", "MY_DOMAIN") ;
+    setExtProperty("defaultDomain", "UNDEFINED_DOMAIN") ;
     setExtProperty("defaultEmail", "contact@${defaultDomain}") ;
 
-    setExtProperty("defaultNexusDomain", "nexus.${defaultDomain}") ;
-    setExtProperty("defaultNexusUrl", "https://${defaultNexusDomain}") ;
-    setExtProperty("defaultArtifactGroup", "com.MY_GROUP") ;
+    setExtProperty("defaultNexusUrl", "https://nexus.${defaultDomain}") ;
+    setExtProperty("defaultArtifactGroup", "com.UNDEFINED_GROUP") ;
 
-    setExtProperty("defaultNexusUsername", "MY_NEXUSUSER") ;
-    setExtProperty("defaultNexusPassword", "MY_NEXUSPASS") ;
+    setExtProperty("defaultNexusUsername", "UNDEFINED_NEXUSUSER") ;
+    setExtProperty("defaultNexusPassword", "UNDEFINED_NEXUSPASS") ;
 
-    setExtProperty("defaultNpmAuthToken", "MY_NPMTOKEN") ;
-    setExtProperty("defaultNpmCacheDir", "MY_NPMCACHEDIR") ;
+    setExtProperty("defaultNpmAuthToken", "UNDEFINED_NPMTOKEN") ;
+    setExtProperty("defaultNpmCacheDir", "UNDEFINED_NPMCACHEDIR") ;
 
     setExtProperty("defaultNpmSnapshotPrefix", "@my-snapshots/") ;
     setExtProperty("defaultNpmReleasePrefix", "@my-releases/") ;    

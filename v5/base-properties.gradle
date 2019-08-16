@@ -5,6 +5,20 @@ def setExtProperty( propVarName, propVarValue ) {
     }
 }
 
+def getUrlHost( url ) {
+    return "${url}".toURL().host
+}
+
+def getHostIP( host , purpose ) {
+    try {
+        return InetAddress.getByName(host).address.collect { it & 0xFF }.join('.')
+    }
+    catch (Exception e) {
+        System.err.println "*** CAN'T RESOLVE HOST: $host > ${purpose}"
+        throw e
+    }
+}
+
 ext {
 
     UNDEFINED = 'undefined' ;

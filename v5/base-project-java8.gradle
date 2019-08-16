@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath "io.franzbecker:gradle-lombok:3.1.0"
     }
-    
+
     if (!gradle.gradleVersion.startsWith("5.")) {
         throw new GradleException('Sapience Foundation /v5/ Gradle scripts requires Gradle 5.+. See file gradle/wrapper/gradle-wrapper.properties in your project.')
     }
@@ -138,7 +138,11 @@ artifacts {
 repositories {
     mavenLocal()
     maven {
+        def nexusHost = getUrlHost(theNexusUrl)
+        getHostIP(nexusHost , "Checking Nexus URL Host")
+
         url "${theNexusUrl}/repository/${theNexusGroup}"
+
         credentials {
             username "${theNexusUsername}"
             password "${theNexusPassword}"

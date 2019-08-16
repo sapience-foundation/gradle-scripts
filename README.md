@@ -53,7 +53,7 @@ Java - Single Project (defining variables with remote configuration file)
 Java - Multi Project
 ----
 
-You should define `gradle.properties` or a `remote configuration file` as in example above:
+You should define `gradle.properties` or a `remote configuration file` as in example above.
 
 - /build.gradle
   ```

@@ -17,8 +17,45 @@ buildscript {
 apply plugin: com.moowork.gradle.node.NodePlugin
 
 ext {
+
+    setExtProperty("organizationNpmAuthToken", "UNDEFINED_NPMTOKEN") ;
+    setExtProperty("organizationNpmCacheDir", "UNDEFINED_NPMCACHEDIR") ;
+
+    setExtProperty("organizationNpmSnapshotPrefix", "@my-snapshots/") ;
+    setExtProperty("organizationNpmReleasePrefix", "@my-releases/") ;
+
+    ////
+
+    theNpmAuthToken = project.hasProperty('npmAuthToken') ? "${npmAuthToken}" : "${organizationNpmAuthToken}"
+    theNpmCacheDir = project.hasProperty('npmCacheDir') ? "${npmCacheDir}" : "${organizationNpmCacheDir}"
+
+    theNpmSnapshotPrefix = project.hasProperty('npmSnapshotPrefix') ? "${npmSnapshotPrefix}" : "${organizationNpmSnapshotPrefix}"
+    theNpmReleasePrefix = project.hasProperty('npmReleasePrefix') ? "${npmReleasePrefix}" : "${organizationNpmReleasePrefix}"
+
+    ////
+
     localNpmCacheDir = '/tmp/npm-cache'
     cmd = project.hasProperty('cmd') ? project.property('cmd') : ''
+
+    ////////////////////////
+
+    println ""
+    println "************************"
+    println "** NPM PROPERTIES **"
+    println "************************"
+    println ""
+
+    if ( !theNpmCacheDir.contains("UNDEFINED_NPMCACHEDIR") ) {
+        println "NPM:"
+        println "-- npmCacheDir: ${theNpmCacheDir}"
+        println "-- npmReleasePrefix: ${theNpmReleasePrefix}"
+        println "-- npmSnapshotPrefix: ${theNpmSnapshotPrefix}"
+        println ""
+    }
+
+    println "************************"
+    println ""
+
 }
 
 node {

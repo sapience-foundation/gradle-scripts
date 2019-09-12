@@ -11,7 +11,7 @@ buildscript {
     }
 
     if (!gradle.gradleVersion.startsWith("5.")) {
-        throw new GradleException('Sapience Foundation /v5/ Gradle scripts requires Gradle 5.+. See file gradle/wrapper/gradle-wrapper.properties in your project.')
+        throw new GradleException('Sapience Foundation /v5/ Gradle Scripts requires Gradle 5.+. See file gradle/wrapper/gradle-wrapper.properties in your project.')
     }
 }
 

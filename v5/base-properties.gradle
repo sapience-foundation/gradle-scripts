@@ -8,7 +8,13 @@ ext.setExtProperty = { propVarName, propVarValue ->
 
 ext.getUrlHost = { url ->
     if ( !url ) return null ;
-    return "${url}".toURL().host
+
+    try {
+        return "${url}".toURL().host
+    }
+    catch (Exception e) {
+        return null ;
+    }
 }
 
 ext.getHostIP = { host , purpose ->
@@ -27,44 +33,32 @@ ext {
 
     UNDEFINED = 'undefined' ;
 
-    setExtProperty("defaultDomain", "UNDEFINED_DOMAIN") ;
-    setExtProperty("defaultEmail", "contact@${defaultDomain}") ;
+    setExtProperty("organizationDomain", "UNDEFINED_DOMAIN") ;
+    setExtProperty("organizationEmail", "contact@${organizationDomain}") ;
 
-    setExtProperty("defaultNexusUrl", "https://nexus.${defaultDomain}") ;
-    setExtProperty("defaultArtifactGroup", "com.UNDEFINED_GROUP") ;
+    setExtProperty("organizationNexusUrl", "https://nexus.${organizationDomain}") ;
+    setExtProperty("organizationArtifactGroup", "UNDEFINED_GROUP") ;
 
-    setExtProperty("defaultNexusUsername", "UNDEFINED_NEXUSUSER") ;
-    setExtProperty("defaultNexusPassword", "UNDEFINED_NEXUSPASS") ;
-
-    setExtProperty("defaultNpmAuthToken", "UNDEFINED_NPMTOKEN") ;
-    setExtProperty("defaultNpmCacheDir", "UNDEFINED_NPMCACHEDIR") ;
-
-    setExtProperty("defaultNpmSnapshotPrefix", "@my-snapshots/") ;
-    setExtProperty("defaultNpmReleasePrefix", "@my-releases/") ;    
+    setExtProperty("organizationNexusUsername", "UNDEFINED_NEXUSUSER") ;
+    setExtProperty("organizationNexusPassword", "UNDEFINED_NEXUSPASS") ;
 
     ////////////////////////
 
-    theDomain = project.hasProperty('theDomain') ? "${theDomain}" : "${defaultDomain}"
-    theEmail = project.hasProperty('theEmail') ? "${theEmail}" : "${defaultEmail}"
+    theDomain = project.hasProperty('domain') ? "${domain}" : "${organizationDomain}"
+    theEmail = project.hasProperty('email') ? "${email}" : "${organizationEmail}"
 
-    theNexusUrl = project.hasProperty('nexusUrl') ? "${nexusUrl}" : "${defaultNexusUrl}"
+    theNexusUrl = project.hasProperty('nexusUrl') ? "${nexusUrl}" : "${organizationNexusUrl}"
     theNexusRepository = project.hasProperty('nexusRepository') ? "${nexusRepository}" : UNDEFINED
     theNexusGroup = project.hasProperty('nexusGroup') ? "${nexusGroup}" : 'maven-public'
-    theNexusUsername = project.hasProperty('nexusUsername') ? "${nexusUsername}" : "${defaultNexusUsername}"
-    theNexusPassword = project.hasProperty('nexusPassword') ? "${nexusPassword}" : "${defaultNexusPassword}"
+    theNexusUsername = project.hasProperty('nexusUsername') ? "${nexusUsername}" : "${organizationNexusUsername}"
+    theNexusPassword = project.hasProperty('nexusPassword') ? "${nexusPassword}" : "${organizationNexusPassword}"
 
-    theArtifactGroup = project.hasProperty('artifactGroup') ? "${artifactGroup}" : "${defaultArtifactGroup}"
+    theArtifactGroup = project.hasProperty('artifactGroup') ? "${artifactGroup}" : "${organizationArtifactGroup}"
 
     theReleaseNumber = project.hasProperty('releaseNumber') ? "${releaseNumber}" : UNDEFINED
     theVersionSuffix = project.hasProperty('versionSuffix') ? "${versionSuffix}" : UNDEFINED
     theArtifactSuffix = project.hasProperty('artifactSuffix') ? "${artifactSuffix}" : UNDEFINED
     theEnvironment = project.hasProperty('environment') ? "${environment}" : UNDEFINED
-
-    theNpmAuthToken = project.hasProperty('npmAuthToken') ? "${npmAuthToken}" : "${defaultNpmAuthToken}"
-    theNpmCacheDir = project.hasProperty('npmCacheDir') ? "${npmCacheDir}" : "${defaultNpmCacheDir}"
-
-    theNpmSnapshotPrefix = project.hasProperty('npmSnapshotPrefix') ? "${npmSnapshotPrefix}" : "${defaultNpmSnapshotPrefix}"
-    theNpmReleasePrefix = project.hasProperty('npmReleasePrefix') ? "${npmReleasePrefix}" : "${defaultNpmReleasePrefix}"
 
     ////////////////////////
     
@@ -73,10 +67,10 @@ ext {
     println "** PROJECT PROPERTIES **"
     println "************************"
     println ""
-    println "-- environment: ${theEnvironment}"
     println "-- domain: ${theDomain}"
     println "-- email: ${theEmail}"
     println "-- artifactGroup: ${theArtifactGroup}"
+    println "-- environment: ${theEnvironment}"
     println ""
     
     if ( !theNexusUrl.contains("UNDEFINED_DOMAIN") ) {
@@ -87,15 +81,7 @@ ext {
       println "-- nexusUsername: ${theNexusUsername}"
       println ""
     }
-    
-    if ( !theNpmCacheDir.contains("UNDEFINED_NPMCACHEDIR") ) {
-      println "NPM:"
-      println "-- npmCacheDir: ${theNpmCacheDir}"
-      println "-- npmReleasePrefix: ${theNpmReleasePrefix}"
-      println "-- npmSnapshotPrefix: ${theNpmSnapshotPrefix}"
-      println ""
-    }
-    
+
     println "************************"
     println ""
     

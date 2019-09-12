@@ -31,6 +31,10 @@ ext.getHostIP = { host , purpose ->
 
 ext {
 
+    if ( gradleScriptsPath == null || gradleScriptsPath == "" ) {
+        gradleScriptsPath = 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master'
+    }
+
     UNDEFINED = 'undefined' ;
 
     setExtProperty("organizationDomain", "UNDEFINED_DOMAIN") ;
@@ -66,6 +70,8 @@ ext {
     println "************************"
     println "** PROJECT PROPERTIES **"
     println "************************"
+    println ""
+    println "-- gradleScriptsPath: ${gradleScriptsPath}"
     println ""
     println "-- domain: ${theDomain}"
     println "-- email: ${theEmail}"

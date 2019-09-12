@@ -1,4 +1,4 @@
-apply from: 'https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master/v5/base-properties.gradle'
+apply from: "${gradleScriptsPath}/v5/base-properties.gradle"
 
 buildscript {
     repositories {

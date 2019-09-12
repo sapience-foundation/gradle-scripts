@@ -8,9 +8,16 @@ Java - Single Project (defining variables at gradle.properties)
 
 - /gradle.properties
   ```
+  ## Gradle Scripts:
+  
   gradleScriptsPath=https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master
+  
+  organizationDomain=your-company.com
   organizationEmail=your@email.com
   organizationArtifactGroup=com.your.company
+  
+  ## ...
+  
   ```
 
 - /build.gradle
@@ -18,10 +25,10 @@ Java - Single Project (defining variables at gradle.properties)
   apply from: "${gradleScriptsPath}/v5/single-project-java8.gradle"
   
   dependencies {
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.7'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.2'
+    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.28'
+    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.1.11'
     
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'junit', name: 'junit', version: '4.12'
   }
   
   ```
@@ -33,6 +40,8 @@ Java - Single Project (defining variables with remote configuration file)
   ```
   ext {
     gradleScriptsPath = "https://raw.githubusercontent.com/sapience-foundation/gradle-scripts/master"
+  
+    organizationDomain = "your-company.com"
     organizationEmail = "your@email.com"
     organizationArtifactGroup = "com.your.company"
   }
